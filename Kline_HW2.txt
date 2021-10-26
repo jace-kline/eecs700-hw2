@@ -1,0 +1,50 @@
+EECS700 HW2 Solution
+Jace Kline 2881618
+
+
+Setup & Running Klee:
+
+* Create a docker container using the `klee/klee` image.
+> docker pull klee/klee
+> docker run -ti --name=klee_container --ulimit='stack=-1:-1' klee/klee
+
+* Compile the `hw2.c` file to LLVM bitcode.
+> clang -emit-llvm -g -c hw2.c -o hw2.bc
+
+* Run Klee on the compiled file. Use a symbolic argument with max length of 4.
+> klee --libc=uclibc --posix-runtime hw2.bc --sym-arg 4
+
+* Get the Klee statistics of the output test cases.
+> klee-stats ./klee-last
+
+
+Questions:
+
+1. How many tests does Klee generate?
+
+Klee generated 31 output test cases from the command shown above.
+Of the 31 test cases, 30 were completed and 1 was partially completed (failed).
+The Klee statistics from running the command `klee-stats ./klee-last` are shown below:
+
+---------------------------------------------------------------------
+| Path |  Instrs|  Time(s)|  ICov(%)|  BCov(%)|  ICount|  TSolver(%)|
+---------------------------------------------------------------------
+|  .   |   27652|     0.15|    11.12|     6.95|   16163|       56.88|
+---------------------------------------------------------------------
+
+
+2. What is the content of the test case that causes the null pointer dereference?
+
+The test case that causes the null pointer dereference (test case 2) has the symbolic argument
+instantiated as the bytes b'pass\xff'. This was obtained from the result of running 
+`ktest-tool test000002.ktest` and the truncated output is shown below:
+
+ktest file : 'test000002.ktest'
+args       : ['hw2.bc', '--sym-arg', '4']
+num objects: 2
+object 0: name: 'arg00'
+object 0: size: 5
+object 0: data: b'pass\xff'
+object 0: hex : 0x70617373ff
+object 0: text: pass.
+...
