@@ -14,9 +14,6 @@ Setup & Running Klee:
 * Run Klee on the compiled file. Use a symbolic argument with max length of 4.
 > klee --libc=uclibc --posix-runtime hw2.bc --sym-arg 4
 
-* Get the Klee statistics of the output test cases.
-> klee-stats ./klee-last
-
 
 Questions:
 
